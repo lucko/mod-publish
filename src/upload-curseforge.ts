@@ -81,7 +81,8 @@ export async function postToCurseForge(
   modLoader: ModLoaderType,
   modInfo: FileInfo,
   curseGameVersions: GameVersionsData[],
-  releaseType: string
+  releaseType: "release" | "beta" | "alpha",
+  changelogInfo: string
 ) {
   const { latestSupportedVersion, supportedVersionIds } =
     getSupportedGameVersionIds(curseGameVersions, modLoader);
@@ -99,7 +100,7 @@ export async function postToCurseForge(
         project +
         " for Minecraft " +
         latestSupportedVersion +
-        " to CurseForge.",
+        " to CurseForge. " + changelogInfo,
       displayName: `${modInfo.version} (${modLoaderCaptialised} ${latestSupportedVersion})`,
       gameVersions: supportedVersionIds,
       releaseType: releaseType,

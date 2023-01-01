@@ -3,15 +3,16 @@ import FormData from "form-data";
 import fs from "fs";
 import { FileInfo, ModLoaderType } from "./types";
 
-const primaryMinecraftVersion = "1.19.2";
-const supportedMinecraftVersions = ["1.19", "1.19.1", "1.19.2"];
+const primaryMinecraftVersion = "1.19.3";
+const supportedMinecraftVersions = ["1.19", "1.19.1", "1.19.2", '1.19.3'];
 
 export async function postToModrinth(
   project: string,
   projectId: string,
   modLoader: ModLoaderType,
   modInfo: FileInfo,
-  releaseType: "release" | "beta" | "alpha"
+  releaseType: "release" | "beta" | "alpha",
+  changelogInfo: string
 ) {
   const form = new FormData();
 
@@ -28,7 +29,7 @@ export async function postToModrinth(
         project +
         " for Minecraft " +
         primaryMinecraftVersion +
-        " to Modrinth.",
+        " to Modrinth. " + changelogInfo,
       dependencies: [],
       game_versions: supportedMinecraftVersions,
       version_type: releaseType,

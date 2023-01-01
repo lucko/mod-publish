@@ -38,6 +38,7 @@ async function spark() {
     });
 
     let resp;
+    const changelogInfo = 'The full changelog can be viewed at https://spark.lucko.me/changelog.';
 
     console.log("Posting to CurseForge....");
     resp = await postToCurseForge(
@@ -46,7 +47,8 @@ async function spark() {
       modLoader,
       modInfo,
       curseGameVersions,
-      modLoader === "forge" ? "release" : "beta"
+      modLoader === "forge" ? "release" : "beta",
+      changelogInfo
     );
     console.log("... success! sleeping for 5s.", resp);
     await sleep(5000);
@@ -57,7 +59,8 @@ async function spark() {
       "l6YH9Als",
       modLoader,
       modInfo,
-      "release"
+      "release",
+      changelogInfo
     );
     console.log("... success! sleeping for 5s.", resp);
     await sleep(5000);
@@ -80,6 +83,7 @@ async function luckPerms() {
     });
 
     let resp;
+    const changelogInfo = 'The full changelog can be viewed at https://luckperms.net/download.'
 
     console.log("Posting to CurseForge....");
     resp = await postToCurseForge(
@@ -88,7 +92,8 @@ async function luckPerms() {
       modLoader,
       modInfo,
       curseGameVersions,
-      modLoader === "fabric" ? "release" : "beta"
+      modLoader === "fabric" ? "release" : "beta",
+      changelogInfo
     );
     console.log("... success! sleeping for 5s.", resp);
     await sleep(5000);
@@ -99,7 +104,8 @@ async function luckPerms() {
       "Vebnzrzj",
       modLoader,
       modInfo,
-      "release"
+      "release",
+      changelogInfo
     );
     console.log("... success! sleeping for 5s.", resp);
     await sleep(5000);
