@@ -3,8 +3,8 @@ import FormData from "form-data";
 import fs from "fs";
 import { FileInfo, ModLoaderType } from "./types";
 
-const primaryMinecraftVersion = "1.19.3";
-const supportedMinecraftVersions = ["1.19", "1.19.1", "1.19.2", '1.19.3'];
+const primaryMinecraftVersion = "1.19.4";
+const supportedMinecraftVersions = ["1.19", "1.19.1", "1.19.2", '1.19.3', '1.19.4'];
 
 export async function postToModrinth(
   project: string,

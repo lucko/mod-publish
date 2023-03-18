@@ -15,6 +15,8 @@ async function main() {
     await spark();
   } else if (type === "luckperms") {
     await luckPerms();
+  } else if (type === "download") {
+    await download();
   } else {
     console.log("Unknown type: " + type);
   }
@@ -24,6 +26,20 @@ function sleep(ms: number) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
+}
+
+async function download() {
+  for (const modLoader of ["forge", "fabric"] as ModLoaderType[]) {
+    let modInfo = await downloadSpark(modLoader);
+    console.log({
+      modInfo,
+    });
+
+    modInfo = await downloadLuckPerms(modLoader);
+    console.log({
+      modInfo,
+    });
+  }
 }
 
 async function spark() {

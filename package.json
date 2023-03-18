@@ -4,6 +4,7 @@
   "description": "",
   "main": "src/index.ts",
   "scripts": {
+    "download": "npx ts-node src/index.ts download",
     "upload-spark": "npx ts-node src/index.ts spark",
     "upload-luckperms": "npx ts-node src/index.ts luckperms",
     "format": "prettier --write '**/*.ts'"
