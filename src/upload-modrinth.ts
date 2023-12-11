@@ -2,9 +2,7 @@ import axios from "axios";
 import FormData from "form-data";
 import fs from "fs";
 import { FileInfo, ModLoaderType } from "./types";
-
-const primaryMinecraftVersion = "1.19.4";
-const supportedMinecraftVersions = ["1.19", "1.19.1", "1.19.2", '1.19.3', '1.19.4'];
+import { primaryMinecraftVersion, supportedMinecraftVersions } from "./version";
 
 export async function postToModrinth(
   project: string,
@@ -29,7 +27,8 @@ export async function postToModrinth(
         project +
         " for Minecraft " +
         primaryMinecraftVersion +
-        " to Modrinth. " + changelogInfo,
+        " to Modrinth. " +
+        changelogInfo,
       dependencies: [],
       game_versions: supportedMinecraftVersions,
       version_type: releaseType,

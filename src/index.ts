@@ -1,7 +1,11 @@
 import { downloadLuckPerms } from "./download-luckperms";
 import { downloadSpark } from "./download-spark";
 import { ModLoaderType } from "./types";
-import { getGameVersionsData, postToCurseForge } from "./upload-curseforge";
+import {
+  getGameVersionsData,
+  getGameVersionTypesData,
+  postToCurseForge,
+} from "./upload-curseforge";
 import { postToModrinth } from "./upload-modrinth";
 
 async function main() {
@@ -43,6 +47,7 @@ async function download() {
 }
 
 async function spark() {
+  const curseGameVersionTypes = await getGameVersionTypesData();
   const curseGameVersions = await getGameVersionsData();
 
   for (const modLoader of ["forge", "fabric"] as ModLoaderType[]) {
@@ -54,7 +59,8 @@ async function spark() {
     });
 
     let resp;
-    const changelogInfo = 'The full changelog can be viewed at https://spark.lucko.me/changelog.';
+    const changelogInfo =
+      "The full changelog can be viewed at https://spark.lucko.me/changelog.";
 
     console.log("Posting to CurseForge....");
     resp = await postToCurseForge(
@@ -62,6 +68,7 @@ async function spark() {
       "361579",
       modLoader,
       modInfo,
+      curseGameVersionTypes,
       curseGameVersions,
       modLoader === "forge" ? "release" : "beta",
       changelogInfo
@@ -88,6 +95,7 @@ async function spark() {
 }
 
 async function luckPerms() {
+  const curseGameVersionTypes = await getGameVersionTypesData();
   const curseGameVersions = await getGameVersionsData();
 
   for (const modLoader of ["forge", "fabric"] as ModLoaderType[]) {
@@ -99,7 +107,8 @@ async function luckPerms() {
     });
 
     let resp;
-    const changelogInfo = 'The full changelog can be viewed at https://luckperms.net/download.'
+    const changelogInfo =
+      "The full changelog can be viewed at https://luckperms.net/download.";
 
     console.log("Posting to CurseForge....");
     resp = await postToCurseForge(
@@ -107,6 +116,7 @@ async function luckPerms() {
       "431733",
       modLoader,
       modInfo,
+      curseGameVersionTypes,
       curseGameVersions,
       modLoader === "fabric" ? "release" : "beta",
       changelogInfo

@@ -2,14 +2,38 @@ import axios from "axios";
 import FormData from "form-data";
 import fs from "fs";
 import { FileInfo, ModLoaderType } from "./types";
+import {
+  baseMinecraftVersion,
+  primaryMinecraftVersion,
+  supportedMinecraftVersions,
+} from "./version";
 
 const supportedJavaVersions = ["java-17", "java-18"];
-const supportedMinecraftVersion = "1.19";
 
-const gameVersionTypes = {
+const knownGameVersionTypes = {
   java: 2,
   modloader: 68441,
 };
+
+export interface GameVersionTypesData {
+  id: number;
+  name: string;
+  slug: string;
+}
+
+export async function getGameVersionTypesData(): Promise<
+  GameVersionTypesData[]
+> {
+  const gameVersionTypes = (
+    await axios.get("https://minecraft.curseforge.com/api/game/version-types", {
+      headers: {
+        "X-Api-Token": process.env.CURSE_API_TOKEN as string,
+        "User-Agent": "github.com/lucko/mod-publish",
+      },
+    })
+  ).data;
+  return gameVersionTypes;
+}
 
 export interface GameVersionsData {
   id: number;
@@ -31,40 +55,37 @@ export async function getGameVersionsData(): Promise<GameVersionsData[]> {
 }
 
 export function getSupportedGameVersionIds(
+  gameVersionTypes: GameVersionTypesData[],
   gameVersions: GameVersionsData[],
   modLoaderType: ModLoaderType
 ) {
   const javaGameVersions = gameVersions.filter(
     (version) =>
-      version.gameVersionTypeID === gameVersionTypes.java &&
+      version.gameVersionTypeID === knownGameVersionTypes.java &&
       supportedJavaVersions.includes(version.slug)
   );
 
   const modloaderGameVersions = gameVersions.filter(
     (version) =>
-      version.gameVersionTypeID === gameVersionTypes.modloader &&
+      version.gameVersionTypeID === knownGameVersionTypes.modloader &&
       version.slug === modLoaderType
   );
 
-  let minecraftGameVersions = gameVersions.filter(
-    (version) => version.name === `${supportedMinecraftVersion}-Snapshot`
+  const minecraftGameVersionTypes = gameVersionTypes.filter(
+    (version) => version.name == `Minecraft ${baseMinecraftVersion}`
   );
-  if (minecraftGameVersions.length != 1) {
+  if (minecraftGameVersionTypes.length != 1) {
     throw new Error(
-      "Invalid number of Minecraft versions (expecting one snapshot!) " +
-        JSON.stringify(minecraftGameVersions, null, 2)
+      "Invalid number of Minecraft versions (expecting one!) " +
+        JSON.stringify(minecraftGameVersionTypes, null, 2)
     );
   }
-  minecraftGameVersions = gameVersions.filter(
-    (version) =>
-      version.gameVersionTypeID ===
-        minecraftGameVersions[0].gameVersionTypeID &&
-      !version.name.includes("Snapshot")
-  );
 
-  const latestSupportedVersion = minecraftGameVersions.sort(
-    (a, b) => b.id - a.id
-  )[0].name;
+  const minecraftGameVersions = gameVersions.filter(
+    (version) =>
+      version.gameVersionTypeID === minecraftGameVersionTypes[0].id &&
+      supportedMinecraftVersions.includes(version.name)
+  );
 
   const supportedVersionIds = [
     ...javaGameVersions,
@@ -72,7 +93,7 @@ export function getSupportedGameVersionIds(
     ...minecraftGameVersions,
   ].map((version) => version.id);
 
-  return { latestSupportedVersion, supportedVersionIds };
+  return supportedVersionIds;
 }
 
 export async function postToCurseForge(
@@ -80,12 +101,16 @@ export async function postToCurseForge(
   projectId: string,
   modLoader: ModLoaderType,
   modInfo: FileInfo,
+  curseGameVersionTypes: GameVersionTypesData[],
   curseGameVersions: GameVersionsData[],
   releaseType: "release" | "beta" | "alpha",
   changelogInfo: string
 ) {
-  const { latestSupportedVersion, supportedVersionIds } =
-    getSupportedGameVersionIds(curseGameVersions, modLoader);
+  const supportedVersionIds = getSupportedGameVersionIds(
+    curseGameVersionTypes,
+    curseGameVersions,
+    modLoader
+  );
 
   const form = new FormData();
 
@@ -99,9 +124,10 @@ export async function postToCurseForge(
         "This update brings the latest version of " +
         project +
         " for Minecraft " +
-        latestSupportedVersion +
-        " to CurseForge. " + changelogInfo,
-      displayName: `${modInfo.version} (${modLoaderCaptialised} ${latestSupportedVersion})`,
+        primaryMinecraftVersion +
+        " to CurseForge. " +
+        changelogInfo,
+      displayName: `${modInfo.version} (${modLoaderCaptialised} ${primaryMinecraftVersion})`,
       gameVersions: supportedVersionIds,
       releaseType: releaseType,
     })
