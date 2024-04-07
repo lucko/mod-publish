@@ -33,7 +33,7 @@ function sleep(ms: number) {
 }
 
 async function download() {
-  for (const modLoader of ["forge", "fabric"] as ModLoaderType[]) {
+  for (const modLoader of ["forge", "fabric", "neoforge"] as ModLoaderType[]) {
     let modInfo = await downloadSpark(modLoader);
     console.log({
       modInfo,
@@ -50,7 +50,7 @@ async function spark() {
   const curseGameVersionTypes = await getGameVersionTypesData();
   const curseGameVersions = await getGameVersionsData();
 
-  for (const modLoader of ["forge", "fabric"] as ModLoaderType[]) {
+  for (const modLoader of ["forge", "fabric", "neoforge"] as ModLoaderType[]) {
     console.log(`---- ${modLoader} ----`);
 
     const modInfo = await downloadSpark(modLoader);
@@ -62,6 +62,13 @@ async function spark() {
     const changelogInfo =
       "The full changelog can be viewed at https://spark.lucko.me/changelog.";
 
+    const releaseTypeMap: Record<ModLoaderType, "release" | "beta" | "alpha"> =
+      {
+        forge: "release",
+        fabric: "beta",
+        neoforge: "alpha",
+      };
+
     console.log("Posting to CurseForge....");
     resp = await postToCurseForge(
       "spark",
@@ -70,7 +77,7 @@ async function spark() {
       modInfo,
       curseGameVersionTypes,
       curseGameVersions,
-      modLoader === "forge" ? "release" : "beta",
+      releaseTypeMap[modLoader],
       changelogInfo
     );
     console.log("... success! sleeping for 5s.", resp);

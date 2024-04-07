@@ -1,4 +1,4 @@
-export type ModLoaderType = "fabric" | "forge";
+export type ModLoaderType = "fabric" | "forge" | "neoforge";
 
 export interface FileInfo {
   fileName: string;

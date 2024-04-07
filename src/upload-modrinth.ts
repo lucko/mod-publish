@@ -14,8 +14,11 @@ export async function postToModrinth(
 ) {
   const form = new FormData();
 
-  const modLoaderCaptialised =
-    modLoader.charAt(0).toUpperCase() + modLoader.slice(1);
+  const modLoaderCaptialised = {
+    forge: "Forge",
+    fabric: "Fabric",
+    neoforge: "NeoForge",
+  }[modLoader];
 
   form.append(
     "data",
