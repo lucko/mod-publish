@@ -1,15 +1,15 @@
 import axios from "axios";
 import fs from "fs";
 import * as Stream from "stream/promises";
-import { FileInfo, ModLoaderType } from "./types";
+import { FileInfo, ModLoaderType, PluginType } from "./types";
 
 export async function downloadLuckPerms(
-  modLoaderType: ModLoaderType
+  type: ModLoaderType | PluginType
 ): Promise<FileInfo> {
   const dataManifest = (
     await axios.get("https://metadata.luckperms.net/data/all")
   ).data;
-  const url = dataManifest.downloads[modLoaderType] as string;
+  const url = dataManifest.downloads[type] as string;
   const fileName = url.substring(url.lastIndexOf("/") + 1);
 
   const resp = await axios.get(url, {

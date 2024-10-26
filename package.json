@@ -7,6 +7,7 @@
     "download": "npx ts-node src/index.ts download",
     "upload-spark": "npx ts-node src/index.ts spark",
     "upload-luckperms": "npx ts-node src/index.ts luckperms",
+    "upload-luckperms-plugin": "npx ts-node src/index.ts luckperms-plugin",
     "format": "prettier --write '**/*.ts'"
   },
   "author": "lucko",

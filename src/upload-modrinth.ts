@@ -1,10 +1,14 @@
 import axios from "axios";
 import FormData from "form-data";
 import fs from "fs";
-import { FileInfo, ModLoaderType } from "./types";
-import { primaryMinecraftVersion, supportedMinecraftVersions } from "./version";
+import { FileInfo, ModLoaderType, PluginType } from "./types";
+import {
+  allPluginMinecraftVersions,
+  primaryMinecraftVersion,
+  supportedMinecraftVersions,
+} from "./version";
 
-export async function postToModrinth(
+export async function postModToModrinth(
   project: string,
   projectId: string,
   modLoader: ModLoaderType,
@@ -12,40 +16,68 @@ export async function postToModrinth(
   releaseType: "release" | "beta" | "alpha",
   changelogInfo: string
 ) {
-  const form = new FormData();
-
   const modLoaderCaptialised = {
     forge: "Forge",
     fabric: "Fabric",
     neoforge: "NeoForge",
   }[modLoader];
 
+  await post(modInfo.fileName, {
+    name: `${modInfo.version} (${modLoaderCaptialised} ${primaryMinecraftVersion})`,
+    version_number: `${modInfo.version}-${modLoader}`,
+    changelog: `This update brings the latest version of ${project} for Minecraft ${primaryMinecraftVersion} to Modrinth. ${changelogInfo}`,
+    dependencies: [],
+    game_versions: supportedMinecraftVersions,
+    version_type: releaseType,
+    loaders: [modLoader],
+    featured: true,
+    project_id: projectId,
+  });
+}
+
+export async function postPluginToModrinth(
+  project: string,
+  projectId: string,
+  pluginType: PluginType,
+  fileInfo: FileInfo,
+  changelogInfo: string
+) {
+  const pluginTypeCapitalised = {
+    bukkit: "Bukkit",
+    bungee: "BungeeCord",
+    velocity: "Velocity",
+  }[pluginType];
+
+  const loaders = {
+    bukkit: ["bukkit", "spigot", "paper"],
+    bungee: ["bungeecord", "waterfall"],
+    velocity: ["velocity"],
+  }[pluginType];
+
+  await post(fileInfo.fileName, {
+    name: `${fileInfo.version} (${pluginTypeCapitalised})`,
+    version_number: `${fileInfo.version}-${pluginType}`,
+    changelog: `This update brings the latest version of ${project} to Modrinth. ${changelogInfo}`,
+    dependencies: [],
+    game_versions: allPluginMinecraftVersions,
+    version_type: "release",
+    loaders: loaders,
+    featured: true,
+    project_id: projectId,
+  });
+}
+
+async function post(fileName: string, data: any) {
+  const form = new FormData();
+
   form.append(
     "data",
-    JSON.stringify({
-      name: `${modInfo.version} (${modLoaderCaptialised} ${primaryMinecraftVersion})`,
-      version_number: `${modInfo.version}-${modLoader}`,
-      changelog:
-        "This update brings the latest version of " +
-        project +
-        " for Minecraft " +
-        primaryMinecraftVersion +
-        " to Modrinth. " +
-        changelogInfo,
-      dependencies: [],
-      game_versions: supportedMinecraftVersions,
-      version_type: releaseType,
-      loaders: [modLoader],
-      featured: true,
-      project_id: projectId,
-      file_parts: ["file"],
-      primary_file: "file",
-    })
+    JSON.stringify({ ...data, file_parts: ["file"], primary_file: "file" })
   );
 
-  const fileData = fs.readFileSync(modInfo.fileName);
+  const fileData = fs.readFileSync(fileName);
   form.append("file", fileData, {
-    filename: modInfo.fileName,
+    filename: fileName,
     contentType: "application/java-archive",
     knownLength: fileData.length,
   });

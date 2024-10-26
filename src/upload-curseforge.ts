@@ -8,7 +8,7 @@ import {
   supportedMinecraftVersions,
 } from "./version";
 
-const supportedJavaVersions = ["java-17", "java-18"];
+const supportedJavaVersions = ["java-21"];
 
 const knownGameVersionTypes = {
   java: 2,
